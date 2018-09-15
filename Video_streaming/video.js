@@ -3,11 +3,11 @@ const fs = require('fs');
 const app = express();
 
 app.get('/', (req, res) => {
-  res.sendFile('C:\\Users\\Gulshan\\Desktop\\ZenRays\\Node\\Video_streaming\\index.html')
+  res.sendFile('.\\index.html')
 });
 
 const buffer = (req, res) => {
-  const path = 'C:\\Users\\Gulshan\\Desktop\\ZenRays\\Node\\Video_streaming\\thor.mp4'
+  const path = '.\\thor.mp4'
   const stat = fs.statSync(path)
   const fileSize = stat.size
   const range = req.headers.range
