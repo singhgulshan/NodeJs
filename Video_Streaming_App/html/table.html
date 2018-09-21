@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="container" style="margin-top: 10%">
+   <div class="panel panel-primary">
+     <div class="panel-heading">
+		 Reservation Table
+	 </div>
+      <div class="panel-body">
+          <table class="table table-bordered table-stripped">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Phone No.</th>
+                <th>No. of guest</th>
+				<th>Time of reservation</th>
+				<th>comments</th>
+				<th>Edit/Delete</th>
+              </tr>
+            </thead>
+            <tbody id="populate_table">
+              
+            </tbody>
+          </table>
+		  
+    </div>
+  </div>
+  
+  <!--<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#editmodal">Edit</button>
+  <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deletemodal">Delete</button>-->
+</div>
+
+
+<!--modal for edit-->
+
+
+<div class="container">
+  
+  <!-- Modal -->
+  <div class="modal fade" id="editmodal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">EDIT RESERVATION</h4>
+        </div>
+        <div class="modal-body">
+		<div class="form-group">
+    		<label for="mobileno">MobileNo:</label>
+    		<input type = "text" id="mobileno2" class="form-control" name = "mobileno">
+		</div>
+		<div class="form-group">
+    		<label for="username">Email:</label>
+    		<input type = "text" id="email" class="form-control" name = "email">
+		</div>
+	<div class="form-group">
+    		<label for="guests">No. of guests:</label>
+    		<input type = "text" id="guests" class="form-control" name = "guests">
+  	</div>
+	<div class="form-group">
+    		<label for="timereservation">Time of reservation:</label>
+    		<input type = "date" id="timereservation" class="form-control" name = "timereservation">
+  	</div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger" value="submit" id="editsubmit">Submit</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+</div>
+
+
+<!--end of modal edit-->
+
+
+
+<!--delete modal-->
+
+<div class="container">
+  
+  <!-- Modal -->
+  <div class="modal fade" id="deletemodal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">DELETE RESERVATION</h4>
+        </div>
+        <div class="modal-body">
+			<div class="form-group">
+    		<label for="mobileno">MobileNo:</label>
+    		<input type = "text" id="mobileno1" class="form-control" name = "mobileno">
+			</div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger" value="submit" id="deletesubmit">Submit</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+</div>
+
+
+<!--end of delete modal-->
+
+
+<script>
+
+$(document).ready(function(){
+
+var str_table='';
+
+$.ajax({
+		url:"http://localhost:3000/api/reservation/findAllReservations",
+		type:'GET',
+		success:function(data, status){
+				//alert("Data: " + JSON.stringify(data) + "\nStatus: " + status);
+
+				for(var i=0 ;i < data.length ; i++){
+
+				  str_table+="<tr>";
+				  str_table+="<td>"+data[i].email+"</td>";
+				  str_table+="<td>"+data[i].phone+"</td>";
+				  str_table+="<td>"+data[i].noofguests+"</td>";
+				  str_table+="<td>"+data[i].reservationtime+"</td>";
+				  str_table+="<td>"+data[i].comments+"</td>";
+				  str_table+='<td><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#editmodal">Edit</button>&nbsp&nbsp&nbsp<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deletemodal">Delete</button></td>';
+				  str_table+="</tr>";
+
+				}
+				
+				//alert(str_table);
+				$('#populate_table').html(str_table);
+
+			}
+	});
+
+
+		$('#deletesubmit').click(function(){
+		
+		var mobileno=$('#mobileno1').val();
+		//alert("i am called"+mobileno);
+		$.ajax({
+			url:"http://localhost:3000/api/reservation/deleteReservation/"+mobileno,
+			type:'GET',
+			success:function(data, status){
+					//alert("status"+status);
+					
+				}
+			});
+		});
+		
+		
+		$('#editsubmit').click(function(){
+		
+		var mobileno=$('#mobileno2').val();
+		var data = {};
+					data.email = $('#email').val();
+					data.phone = mobileno;
+					data.noofguests = $('#guests').val();
+					data.reservationtime = $('#timereservation').val();
+					data.comments = $('#comments').val();
+		//alert("i am called"+mobileno);
+		$.ajax({
+			url:"http://localhost:3000/api/reservation/updateReservation/"+mobileno,
+			type:'PUT',
+			data: data,
+			success:function(data, status){
+					//alert("status"+status);
+					$('#editmodal').html('<div class="alert alert-success"><strong>Success!</strong> Indicates a successful or positive action.</div>');
+				}
+			});
+		});
+
+});
+</script>
+
+</body>
+</html>
